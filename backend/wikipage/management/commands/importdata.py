@@ -1,26 +1,16 @@
 import os
+import pandas as pd
 from django.conf import settings
-import csv
 from django.core.management.base import BaseCommand
-from wikipage.models import Wikipage
-from django.db import transaction
+from sqlalchemy import create_engine
+from wikipage.models import *
 
 class Command(BaseCommand):
     help = 'Import data from a CSV file into the database'
 
     def handle(self, *args, **options):
-        csv_file_path = os.path.join(settings.BASE_DIR, 'csvfiles', 'selected_data.csv')
-
-        with open(csv_file_path, 'r') as file:
-            csv_reader = csv.reader(file)
-            next(csv_reader)
-            wikipage_list = []
-            for row in csv_reader:
-                date = row[0]
-                title = row[1]
-                views = row[2]
-                wikipage = Wikipage(date=date, title=title, views=views)
-                wikipage_list.append(wikipage)
-            with transaction.atomic():
-                Wikipage.objects.bulk_create(wikipage_list)
+        csv_file_path = os.path.join(settings.BASE_DIR, 'csvfiles', 'test.csv')
+        df = pd.read_csv(csv_file_path)
+        engine = create_engine('sqlite:///db.sqlite3')
+        df.to_sql(Wikipage._meta.db_table, con=engine, if_exists='append', index=False)
         self.stdout.write(self.style.SUCCESS(f'Successfully imported data'))
