@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'WikipageDB',
         'USER': 'admin',
         'PASSWORD': 'admin123',
-        'HOST': 'wikipagedb.cucxptcd7b4g.us-west-2.rds.amazonaws.com',
+        'HOST': 'wikidb.cucxptcd7b4g.us-west-2.rds.amazonaws.com',
         'PORT': 3306,
     }
 }
