@@ -6,3 +6,6 @@ def index(request, *args, **kwargs):
 
 def event(request, *args, **kwargs):
     return render(request, 'frontend/event.html')
+
+def trend(request, *args, **kwargs):
+    return render(request, 'frontend/trend.html')

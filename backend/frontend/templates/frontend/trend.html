@@ -1,0 +1,111 @@
+<!DOCTYPE html >
+<html>
+<body>
+    <header>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"/>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <div id="logo"> 
+            <h2>WikiTrends</h2>
+        </div> 
+        <div id="topNav">
+            <nav>
+                <li><a href="/">Home</a></li>
+                <li><a href="event">EventViews</a></li>
+                <li class="active"><a href="trendings">Trendings</a></li>
+            </nav>
+        </div>
+    </header>
+
+    <div class = "home-page">
+        <hr>
+        <h4>Hi, this is the home page of our web-application. Post</h4>
+        <label for="userInput">Please enter a single word in English to view its trendings:</label>
+        <input type="text" id="userInput" placeholder="e.g. cat, dog ..."><br><br>
+
+        <label for="startTime">Please enter the startTime:</label>
+        <input type="date" id="startTime" placeholder=""><br><br>
+        <label for="endTime">Please enter the endTime:</label>
+        <input type="date" id="endTime" placeholder=""><br><br>
+        <input type="submit" value="Submit" id="my_button"> 
+    </div>
+
+    <script>
+
+        function getStartTime() {
+            var startTime = document.getElementById("startTime").value;
+            var endTime = document.getElementById("endTime").value;
+            var keyword = document.getElementById("userInput").value;
+            console.log("keyword: " + keyword);
+
+            keyword = keyword.trim();
+            if (keyword == "") {
+                alert ("The keyword cannot be empty!")
+            }
+            
+            if (startTime > endTime) {
+                alert("The start date needs to before than end date!");
+            }
+
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            console.log(formattedDate);
+
+            if (endTime >= formattedDate) {
+                alert("The end date needs to before than current date!");
+            }
+
+            var english = /^[A-Za-z0-9]*$/;
+            if (english.test(keyword) == false) {
+                alert("The keyword is not in English!");
+            }
+
+            var data = {"keyword": keyword ,"startTime": startTime, "endTime": endTime};
+
+            axios.post('http://52.38.55.145:8000/wikipage/post-req/', data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                // Handle the response data here
+                console.log(response.data);
+            })
+            .catch((error) => {
+                // Handle any errors that occur during the request
+                console.error('Error:', error);
+            });
+
+            // fetch('http://52.38.55.145:8000/wikipage/post-req/', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(data),
+            // })
+            // .then((response) => {
+            //     if (!response.ok) {
+            //         console.log(data);
+            //         throw new Error('Network response was not ok');
+            //     }
+            //     return response.json(); // Parse the response JSON
+            // })
+            // .then((data) => {
+            //     console.log(data);
+            // })
+            // .catch((error) => {
+            //     // Handle any errors that occur during the request
+            //     console.error('Error:', error);
+            // });
+
+            
+        };
+        document.getElementById("my_button").onclick = getStartTime; 
+        
+    </script>
+</body>
+</html>
+
