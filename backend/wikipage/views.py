@@ -7,6 +7,7 @@ from .serializers import *
 from .models import *
 from wikipage.models import Wikipage
 import json
+import calendar
 
 # Create your views here.
 def hello(response):
@@ -57,25 +58,41 @@ class PostRequest(APIView):
                     months.append(f"{year}-{month:02d}")
         return months
     
+
     def get_views(self, months, keyword, start_date, end_date):
         views = {}
         for month in months:
             results = Wikipage.objects.filter(month=month, keyword=keyword)
-            if results.count() == 0:
-                return Response("No such record")
+            if not results.exists():
+                continue
+            
+            tot_days = self.days_in_month(month)
+            tot_views = {}
             for result in results:
-                nums = [int(x) for x in result.views.split("-")]
-                if (len(months) == 1):
-                    for i in range(start_date - 1, end_date):
-                        views[f"{month}-{i + 1:02d}"] = nums[i]
-                    return views
-                if (month == months[0]):
-                    for i in range(start_date - 1, len(nums)):
-                        views[f"{month}-{i + 1:02d}"] = nums[i]
-                elif (month == months[-1]):
-                    for i in range(0, end_date):
-                        views[f"{month}-{i + 1:02d}"] = nums[i]
-                else:
-                    for i in range(0, len(nums)):
-                        views[f"{month}-{i + 1:02d}"] = nums[i]
+                nums = [x.split(":") for x in result.views.split("-") if len(x.split(":")) == 2]
+                for day, view in nums:
+                    tot_views[f"{month}-{int(day):02d}"] = int(view)
+
+            # Fill missing dates with 0 views
+            if len(months) == 1:
+                date_range = range(start_date, end_date + 1)
+            elif month == months[0]:
+                date_range = range(start_date, tot_days + 1)
+            elif month == months[-1]:
+                date_range = range(1, end_date + 1)
+            else:
+                date_range = range(1, tot_days + 1)
+                
+            for i in date_range:
+                key = f"{month}-{i:02d}"
+                views[key] = 0
+                if key in tot_views:
+                    views[key] = tot_views[key]
+
+        views = dict(sorted(views.items()))
         return views
+    
+    def days_in_month(self, s):
+        year, month = map(int, s.split('-'))
+        return calendar.monthrange(year, month)[1]
+
