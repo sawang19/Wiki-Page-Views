@@ -71,7 +71,7 @@ class PostRequest(APIView):
             for result in results:
                 nums = [x.split(":") for x in result.views.split("-") if len(x.split(":")) == 2]
                 for day, view in nums:
-                    tot_views[f"{month}-{int(day):02d}"] = int(view)
+                    tot_views[f"{month}-{int(day):02d}"] = tot_views[f"{month}-{int(day):02d}"] + int(view)
 
             # Fill missing dates with 0 views
             if len(months) == 1:
