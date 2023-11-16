@@ -5,6 +5,7 @@
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"/>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <div id="logo"> 
             <h2>WikiTrends</h2>
         </div> 
@@ -30,6 +31,9 @@
         <input type="submit" value="Submit" id="my_button"> 
     </div>
 
+    <canvas id="myChart"></canvas>
+    
+    
     <script>
 
         function getStartTime() {
@@ -52,7 +56,6 @@
             const month = (today.getMonth() + 1).toString().padStart(2, '0');
             const day = today.getDate().toString().padStart(2, '0');
             const formattedDate = `${year}-${month}-${day}`;
-            console.log(formattedDate);
 
             if (endTime >= formattedDate) {
                 alert("The end date needs to before than current date!");
@@ -71,35 +74,33 @@
                 }
             })
             .then((response) => {
-                // Handle the response data here
-                console.log(response.data);
+                let data_string = response.data;
+                const data_dict = JSON.parse(data_string);
+                console.log(data_dict)
+                views = data_dict["views"]
+                if (Object.keys(views).length == 0) {
+                    alert ("The keyword cannot be found in the given timeframe")
+                }
+                const plot_prep = []
+                for (const [key, value] of Object.entries(views)) {
+                    plot_prep.push({ x: key, y: value });
+                }
+                console.log(plot_prep)
+                const ctx = document.getElementById('myChart').getContext('2d');
+                console.log(ctx)
+                const cfg = {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            data: plot_prep,
+                        }]
+                    },
+                }
+                const myChart = new Chart(ctx, cfg);
             })
             .catch((error) => {
-                // Handle any errors that occur during the request
                 console.error('Error:', error);
             });
-
-            // fetch('http://52.38.55.145:8000/wikipage/post-req/', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify(data),
-            // })
-            // .then((response) => {
-            //     if (!response.ok) {
-            //         console.log(data);
-            //         throw new Error('Network response was not ok');
-            //     }
-            //     return response.json(); // Parse the response JSON
-            // })
-            // .then((data) => {
-            //     console.log(data);
-            // })
-            // .catch((error) => {
-            //     // Handle any errors that occur during the request
-            //     console.error('Error:', error);
-            // });
 
             
         };
