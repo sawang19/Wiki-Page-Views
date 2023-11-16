@@ -35,7 +35,7 @@
     
     
     <script>
-
+        var myChart;
         function getStartTime() {
             var startTime = document.getElementById("startTime").value;
             var endTime = document.getElementById("endTime").value;
@@ -86,17 +86,35 @@
                     plot_prep.push({ x: key, y: value });
                 }
                 console.log(plot_prep)
-                const ctx = document.getElementById('myChart').getContext('2d');
-                console.log(ctx)
-                const cfg = {
-                    type: 'line',
-                    data: {
-                        datasets: [{
-                            data: plot_prep,
-                        }]
-                    },
+                // const ctx = document.getElementById('myChart').getContext('2d');
+                // console.log(ctx)
+                // const cfg = {
+                //     type: 'line',
+                //     data: {
+                //         datasets: [{
+                //             data: plot_prep,
+                //         }]
+                //     },
+                // }
+                // const myChart = new Chart(ctx, cfg);
+                // Check if the chart already exists
+                if (myChart) {
+                    myChart.data.datasets[0].data = plot_prep;
+                    myChart.update();
+                } else {
+                    // Create a new chart
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    console.log(ctx)
+                    const cfg = {
+                        type: 'line',
+                        data: {
+                            datasets: [{
+                                data: plot_prep,
+                            }]
+                        },
+                    }
+                    myChart = new Chart(ctx, cfg);
                 }
-                const myChart = new Chart(ctx, cfg);
             })
             .catch((error) => {
                 console.error('Error:', error);
