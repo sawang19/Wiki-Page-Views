@@ -61,19 +61,9 @@ class PostRequest(APIView):
 
     def get_views(self, months, keyword, start_date, end_date):
         views = {}
-        for month in months:
-            results = Wikipage.objects.filter(month=month, keyword=keyword)
-            if not results.exists():
-                continue
-            
-            tot_days = self.days_in_month(month)
-            tot_views = {}
-            for result in results:
-                nums = [x.split(":") for x in result.views.split("-") if len(x.split(":")) == 2]
-                for day, view in nums:
-                    tot_views[f"{month}-{int(day):02d}"] = tot_views[f"{month}-{int(day):02d}"] + int(view)
 
-            # Fill missing dates with 0 views
+        for month in months:
+            tot_days = self.days_in_month(month)
             if len(months) == 1:
                 date_range = range(start_date, end_date + 1)
             elif month == months[0]:
@@ -82,15 +72,22 @@ class PostRequest(APIView):
                 date_range = range(1, end_date + 1)
             else:
                 date_range = range(1, tot_days + 1)
-                
-            for i in date_range:
-                key = f"{month}-{i:02d}"
-                views[key] = 0
-                if key in tot_views:
-                    views[key] = tot_views[key]
 
-        views = dict(sorted(views.items()))
-        return views
+            for day in date_range:
+                key = f"{month}-{day:02d}"
+                views[key] = 0
+
+        for month in months:
+            results = Wikipage.objects.filter(month=month, keyword=keyword)
+            for result in results:
+                nums = [x.split(":") for x in result.views.split("-") if len(x.split(":")) == 2]
+                for day, view in nums:
+                    key = f"{month}-{int(day):02d}"
+                    if key in views: 
+                        views[key] += int(view)
+
+        return dict(sorted(views.items()))
+
     
     def days_in_month(self, s):
         year, month = map(int, s.split('-'))
