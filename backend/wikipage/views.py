@@ -22,10 +22,10 @@ class WikipageView(generics.CreateAPIView):
 
 class GetRequest(APIView):
     def get(self, request):
-        result = Wikipage.objects.filter(month='2023-01', keyword='Sa')
+        result = Wikipage.objects.filter(month='2023-01', title__icontains='Sa')
         if result.count() == 0:
             return Response("No such record")
-        data = {result[0].keyword: result[0].views}
+        data = {result[0].title: result[0].views}
         return Response(data)
     
 class PostRequest(APIView):
@@ -78,7 +78,7 @@ class PostRequest(APIView):
                 views[key] = 0
 
         for month in months:
-            results = Wikipage.objects.filter(month=month, keyword=keyword)
+            results = Wikipage.objects.filter(month=month, title__icontains=keyword)
             for result in results:
                 nums = [x.split(":") for x in result.views.split("-") if len(x.split(":")) == 2]
                 for day, view in nums:
