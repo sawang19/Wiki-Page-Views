@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'WikipageDB',
+        'NAME': 'wiki',
         'USER': 'admin',
         'PASSWORD': 'admin123',
         'HOST': 'wikidb.cucxptcd7b4g.us-west-2.rds.amazonaws.com',
