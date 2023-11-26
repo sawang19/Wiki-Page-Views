@@ -3,5 +3,5 @@ from .models import *
 
 class WikipageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Wikipage
+        model = Wikipage2301
         fields = '__all__'
