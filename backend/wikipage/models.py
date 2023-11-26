@@ -7,7 +7,7 @@ import datetime
 class Wikipage2301(models.Model):
     id = models.CharField(primary_key=True, max_length=128, default='')
     keyword = models.CharField(max_length=32, default='')
-    views = models.CharField(max_length=256)
+    views = models.CharField(max_length=1024)
 
     class Meta:
         indexes = [
