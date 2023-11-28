@@ -1,6 +1,5 @@
 header {
     background-color: #e8e8e8;
-    position: fixed;
     height: 50px;
     display: flex;
     width: 100%;
@@ -15,7 +14,6 @@ header {
     font-family: Georgia,serif;
     font-weight: normal;
     letter-spacing: 0px;
-    /* space between the lines */
     line-height: 1.6em; 
     font-size: 13px;
     text-transform: uppercase;
@@ -44,11 +42,15 @@ body
 }
 .home-page {
     width: 100%;
-    position: absolute;
-    margin-top: 50px;
-    text-align: center;
+    margin-top: 10px;
 }
 
+.chart_container {
+    width: 1000px;
+    height:600px;
+    margin-top: 10px;
+ }
+ 
 #userInput {
     width: 30%;
 }

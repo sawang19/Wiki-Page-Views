@@ -20,8 +20,8 @@
 
     <div class = "home-page">
         <hr>
-        <h4>Hi, this is the home page of our web-application. Post</h4>
         <label for="userInput">Please enter a single word in English to view its trendings:</label>
+        <br>
         <input type="text" id="userInput" placeholder="e.g. cat, dog ..."><br><br>
 
         <label for="startTime">Please enter the startTime:</label>
@@ -31,11 +31,13 @@
         <input type="submit" value="Submit" id="my_button"> 
     </div>
 
-    <canvas id="myChart"></canvas>
-    
+    <div class = "chart_container">
+        <canvas id="myChart"></canvas>
+    </div>
+
     
     <script>
-        var myChart;
+        var chart;
         function getStartTime() {
             var startTime = document.getElementById("startTime").value;
             var endTime = document.getElementById("endTime").value;
@@ -86,41 +88,32 @@
                     plot_prep.push({ x: key, y: value });
                 }
                 console.log(plot_prep)
-                // const ctx = document.getElementById('myChart').getContext('2d');
-                // console.log(ctx)
-                // const cfg = {
-                //     type: 'line',
-                //     data: {
-                //         datasets: [{
-                //             data: plot_prep,
-                //         }]
-                //     },
-                // }
-                // const myChart = new Chart(ctx, cfg);
-                // Check if the chart already exists
-                if (myChart) {
-                    myChart.data.datasets[0].data = plot_prep;
-                    myChart.update();
+
+                if (chart) {
+                    chart.data.datasets[0].data = plot_prep;
+                    chart.data.datasets[0].label = keyword;
+                    chart.update();
                 } else {
-                    // Create a new chart
                     const ctx = document.getElementById('myChart').getContext('2d');
-                    console.log(ctx)
                     const cfg = {
                         type: 'line',
                         data: {
                             datasets: [{
+                                label: keyword,
                                 data: plot_prep,
                             }]
                         },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
                     }
-                    myChart = new Chart(ctx, cfg);
+                    chart = new Chart(ctx, cfg);
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
-
-            
         };
         document.getElementById("my_button").onclick = getStartTime; 
         
