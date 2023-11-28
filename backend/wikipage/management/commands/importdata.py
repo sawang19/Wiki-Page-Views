@@ -23,6 +23,6 @@ class Command(BaseCommand):
             column_names = ['id', 'keyword', 'views']
             df.columns = column_names
 
-            df.to_sql(Wikipage2301._meta.db_table, con=engine, if_exists='append', index=False)
+            df.to_sql(monthly_models['01']._meta.db_table, con=engine, if_exists='append', index=False)
             self.stdout.write(self.style.SUCCESS(f'Successfully imported ' + file_path + ' count = ' + str(count)))
             count += 1
