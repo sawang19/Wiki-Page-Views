@@ -6,6 +6,9 @@
         <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"/>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
         <div id="logo"> 
             <h2>WikiTrends</h2>
         </div> 
@@ -17,9 +20,9 @@
             </nav>
         </div>
     </header>
-
+    <hr>
     <div class = "home-page">
-        <hr>
+        
         <label for="userInput">Please enter a single word in English to view its trendings:</label>
         <br>
         <input type="text" id="userInput" placeholder="e.g. cat, dog ..."><br><br>
@@ -38,7 +41,12 @@
     
     <script>
         var chart;
-        function getStartTime() {
+        var input = document.querySelector('input[id=userInput]');
+        var tags = new Tagify(input);
+
+        function getUserInput() {
+            console.log(tags)
+            
             var startTime = document.getElementById("startTime").value;
             var endTime = document.getElementById("endTime").value;
             var keyword = document.getElementById("userInput").value;
@@ -67,6 +75,11 @@
             if (english.test(keyword) == false) {
                 alert("The keyword is not in English!");
             }
+
+            keyword="cat"
+            startTime="2023-01-01"
+            endTime="2023-01-29"
+            keyword_arr = []
 
             var data = {"keyword": keyword ,"startTime": startTime, "endTime": endTime};
 
@@ -115,7 +128,7 @@
                 console.error('Error:', error);
             });
         };
-        document.getElementById("my_button").onclick = getStartTime; 
+        document.getElementById("my_button").onclick = getUserInput; 
         
     </script>
 </body>
