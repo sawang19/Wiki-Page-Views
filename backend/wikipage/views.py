@@ -95,5 +95,23 @@ class PostRequest(APIView):
         year, month = map(int, s.split('-'))
         return calendar.monthrange(year, month)[1]
     
-    
+class Top10Request(APIView):
+    def post(self, request):
+        date = request.data['date']
+        top10 = wikitop10.objects.filter(date=date)
+
+        titles = []
+        views = []
+        for item in top10:
+            titles.extend([item.title_1, item.title_2, item.title_3, item.title_4, item.title_5, 
+                           item.title_6, item.title_7, item.title_8, item.title_9, item.title_10])
+
+            views.extend([item.views_1, item.views_2, item.views_3, item.views_4, item.views_5, 
+                          item.views_6, item.views_7, item.views_8, item.views_9, item.views_10])
+
+        response_data = {
+            'titles': titles,
+            'views': views,
+        }
+        return Response(json.dumps(response_data))
 
