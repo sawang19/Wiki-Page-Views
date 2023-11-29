@@ -23,9 +23,9 @@
     <hr>
     <div class = "home-page">
         
-        <label for="userInput">Please enter a single word in English to view its trendings:</label>
+        <label for="keyword">Please enter a single word in English to view its trendings:</label>
         <br>
-        <input type="text" id="userInput" placeholder="e.g. cat, dog ..."><br><br>
+        <input type="text" id="keyword" placeholder="e.g. cat, dog ..."><br><br>
 
         <label for="startTime">Please enter the startTime:</label>
         <input type="date" id="startTime" placeholder=""><br><br>
@@ -41,24 +41,42 @@
     
     <script>
         var chart;
-        var input = document.querySelector('input[id=userInput]');
+        var input = document.querySelector('input[id=keyword]');
+        console.log("input: " + input.value)
+        
         var tags = new Tagify(input);
 
-        function getUserInput() {
-            console.log(tags)
-            
+        function checkUserInput() {
+            if (input.value == "") {
+                return false;
+            }
+            // console.log(tags)
             var startTime = document.getElementById("startTime").value;
             var endTime = document.getElementById("endTime").value;
-            var keyword = document.getElementById("userInput").value;
-            console.log("keyword: " + keyword);
-
-            keyword = keyword.trim();
-            if (keyword == "") {
+            var tags = document.getElementById("keyword").value;
+            // console.log("tags: " + tags);
+            const objArray = JSON.parse(tags);
+            const count = objArray.length;
+            // console.log("Number of objects:", count);
+            const words = objArray.map(obj => obj.value);
+            // console.log("Extracted words:", words);
+            if (tags == "") {
                 alert ("The keyword cannot be empty!")
+                return false;
+            }
+
+            if (startTime == "") {
+                alert ("The startTime cannot be empty!")
+                return false;
+            }
+            if (endTime == "") {
+                alert ("The endTime cannot be empty!")
+                return false;
             }
             
             if (startTime > endTime) {
                 alert("The start date needs to before than end date!");
+                return false;
             }
 
             const today = new Date();
@@ -71,64 +89,106 @@
                 alert("The end date needs to before than current date!");
             }
 
-            var english = /^[A-Za-z0-9]*$/;
-            if (english.test(keyword) == false) {
-                alert("The keyword is not in English!");
+            var tags_arr = []
+            for (let i = 0; i < count; i++) {
+                var keyword = words[i];
+                keyword = keyword.trim();
+                // console.log(keyword)
+
+                var english = /^[A-Za-z0-9]*$/;
+                if (english.test(keyword) == false) {
+                    alert("The keyword is not in English!");
+                    return false;
+                }
+                tags_arr.push(keyword);
             }
+            return [startTime, endTime, tags_arr];
+        }
 
-            keyword="cat"
-            startTime="2023-01-01"
-            endTime="2023-01-29"
-            keyword_arr = []
+        async function plotChart(returnedValue) {
+            console.log("in " + returnedValue[2]);
+            var dtset = [];
+            var promises = [];
+            
+            for (let i = 0; i < returnedValue[2].length; i++) {
+                const startTime = returnedValue[0];
+                const endTime = returnedValue[1];
+                const keyword = returnedValue[2][i];
+                var data = {"keyword": keyword ,"startTime": startTime, "endTime": endTime};
+                // console.log(data)
 
-            var data = {"keyword": keyword ,"startTime": startTime, "endTime": endTime};
+                promises.push(
+                    axios.post('http://52.38.55.145:8000/wikipage/post-req/', data, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then((response) => {
+                        let data_string = response.data;
+                        const data_dict = JSON.parse(data_string);
+                        // console.log("data_dict", data_dict)
+                        views = data_dict["views"]
 
-            axios.post('http://52.38.55.145:8000/wikipage/post-req/', data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => {
-                let data_string = response.data;
-                const data_dict = JSON.parse(data_string);
-                console.log(data_dict)
-                views = data_dict["views"]
-                if (Object.keys(views).length == 0) {
-                    alert ("The keyword cannot be found in the given timeframe")
-                }
-                const plot_prep = []
-                for (const [key, value] of Object.entries(views)) {
-                    plot_prep.push({ x: key, y: value });
-                }
-                console.log(plot_prep)
+                        const plot_prep = []
+                        for (const [key, value] of Object.entries(views)) {
+                            plot_prep.push({ x: key, y: value });
+                        }
+                        // console.log(plot_prep)
 
-                if (chart) {
-                    chart.data.datasets[0].data = plot_prep;
-                    chart.data.datasets[0].label = keyword;
-                    chart.update();
-                } else {
-                    const ctx = document.getElementById('myChart').getContext('2d');
-                    const cfg = {
-                        type: 'line',
-                        data: {
-                            datasets: [{
-                                label: keyword,
-                                data: plot_prep,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
+                        if (!chart) {
+                            sub_dataset = {label: keyword, data: plot_prep};
+                            dtset.push(sub_dataset);
+                            // console.log("no chart", i)
+                        } else {
+                            if (i == 0) {
+                                chart.data.datasets = dtset;
+                            } 
+                            sub_dataset = {label: keyword, data: plot_prep};
+                            dtset.push(sub_dataset);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    })
+                );
+            }
+            await Promise.all(promises);
+            return dtset;
+        }
+
+
+        
+        var button = document.getElementById("my_button");
+        button.addEventListener("click", async function() {
+            var returnedValue = checkUserInput();
+            // console.log("Returned value from the button click:", returnedValue);
+            if (returnedValue != false) {
+                var curr_data = await plotChart(returnedValue);
+                // console.log("curr_daata", curr_data);
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const cfg = {
+                    type: 'line',
+                    data: {
+                        datasets: curr_data
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                                colors: {
+                                    forceOverride: true
+                            }
                         }
                     }
+                }
+                if (!chart) {
                     chart = new Chart(ctx, cfg);
                 }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        };
-        document.getElementById("my_button").onclick = getUserInput; 
+                else {
+                    chart.update();
+                }
+            }
+        });
         
     </script>
 </body>
