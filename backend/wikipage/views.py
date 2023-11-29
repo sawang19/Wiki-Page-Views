@@ -3,9 +3,9 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import *
-from .models import *
-from wikipage.models import Wikipage2301
+# from .serializers import *
+# from .models import *
+from wikipage.models import *
 import json
 import calendar
 
@@ -16,13 +16,13 @@ def hello(response):
 def index(request):
     return render(request, "index.html")
 
-class WikipageView(generics.CreateAPIView):
-    queryset = Wikipage2301.objects.all()
-    serializer_class = WikipageSerializer
+# class WikipageView(generics.CreateAPIView):
+#     queryset = Wikipage2301.objects.all()
+#     serializer_class = WikipageSerializer
 
 class GetRequest(APIView):
     def get(self, request):
-        result = Wikipage2301.objects.filter(month='2023-01', keyword='Sa')
+        result = monthly_models['01'].objects.filter(month='2023-01', keyword='Sa')
         if result.count() == 0:
             return Response("No such record")
         data = {result[0].keyword: result[0].views}
@@ -78,14 +78,15 @@ class PostRequest(APIView):
                 views[key] = 0
 
         for month in months:
-            if month == '2023-01':
-                results = Wikipage2301.objects.filter(keyword=keyword)
-                for result in results:
-                    nums = [x.split(":") for x in result.views.split("-") if len(x.split(":")) == 2]
-                    for day, view in nums:
-                        key = f"{month}-{int(day):02d}"
-                        if key in views: 
-                            views[key] += int(view)
+            # if month == '2023-01':
+            month_part = month.split('-')[1]
+            results = monthly_models[month_part].objects.filter(keyword=keyword)
+            for result in results:
+                nums = [x.split(":") for x in result.views.split("-") if len(x.split(":")) == 2]
+                for day, view in nums:
+                    key = f"{month}-{int(day):02d}"
+                    if key in views: 
+                        views[key] += int(view)
 
         return dict(sorted(views.items()))
 
