@@ -21,3 +21,30 @@ def create_monthly_model(month):
     return model
 
 monthly_models = {f'{month:02}': create_monthly_model(month) for month in range(1, 13)}
+
+class wikitop10(models.Model):
+    date = models.CharField(primary_key=True, default='2023-01-01', max_length=16)
+    title_1 = models.CharField(max_length=128, default='')
+    views_1 = models.CharField(max_length=32, default='')
+    title_2 = models.CharField(max_length=128, default='')
+    views_2 = models.CharField(max_length=32, default='')
+    title_3 = models.CharField(max_length=128, default='')
+    views_3 = models.CharField(max_length=32, default='')
+    title_4 = models.CharField(max_length=128, default='')
+    views_4 = models.CharField(max_length=32, default='')
+    title_5 = models.CharField(max_length=128, default='')
+    views_5 = models.CharField(max_length=32, default='')
+    title_6 = models.CharField(max_length=128, default='')
+    views_6 = models.CharField(max_length=32, default='')
+    title_7 = models.CharField(max_length=128, default='')
+    views_7 = models.CharField(max_length=32, default='')
+    title_8 = models.CharField(max_length=128, default='')
+    views_8 = models.CharField(max_length=32, default='')
+    title_9 = models.CharField(max_length=128, default='')
+    views_9 = models.CharField(max_length=32, default='')
+    title_10 = models.CharField(max_length=128, default='')
+    views_10 = models.CharField(max_length=32, default='')
+
+    def __str__(self):
+        return self.date
+
