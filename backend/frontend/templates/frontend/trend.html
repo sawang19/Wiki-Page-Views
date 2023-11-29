@@ -42,26 +42,23 @@
     <script>
         var chart;
         var input = document.querySelector('input[id=keyword]');
-        console.log("input: " + input.value)
-        
         var tags = new Tagify(input);
 
         function checkUserInput() {
-            if (input.value == "") {
+            var tagifyTags = tags.value.map(tag => tag.value);
+            const count = tagifyTags.length;
+            const words = tagifyTags;
+
+            if (tagifyTags.length === 0) {
+                alert("The keyword cannot be empty!");
                 return false;
             }
-            // console.log(tags)
+
             var startTime = document.getElementById("startTime").value;
             var endTime = document.getElementById("endTime").value;
-            var tags = document.getElementById("keyword").value;
-            // console.log("tags: " + tags);
-            const objArray = JSON.parse(tags);
-            const count = objArray.length;
-            // console.log("Number of objects:", count);
-            const words = objArray.map(obj => obj.value);
-            // console.log("Extracted words:", words);
-            if (tags == "") {
-                alert ("The keyword cannot be empty!")
+
+            if (tagifyTags.length === 0) {
+                alert("The keyword cannot be empty!");
                 return false;
             }
 
@@ -157,9 +154,10 @@
         }
 
 
-        
         var button = document.getElementById("my_button");
         button.addEventListener("click", async function() {
+            // var content = document.getElementById("keyword").value;
+            // console.log("content", content)
             var returnedValue = checkUserInput();
             // console.log("Returned value from the button click:", returnedValue);
             if (returnedValue != false) {
