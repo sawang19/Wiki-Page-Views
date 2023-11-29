@@ -10,23 +10,8 @@ import json
 import calendar
 
 # Create your views here.
-def hello(response):
-    return HttpResponse("Hello you")
-
 def index(request):
     return render(request, "index.html")
-
-# class WikipageView(generics.CreateAPIView):
-#     queryset = Wikipage2301.objects.all()
-#     serializer_class = WikipageSerializer
-
-class GetRequest(APIView):
-    def get(self, request):
-        result = monthly_models['01'].objects.filter(month='2023-01', keyword='Sa')
-        if result.count() == 0:
-            return Response("No such record")
-        data = {result[0].keyword: result[0].views}
-        return Response(data)
     
 class PostRequest(APIView):
     def post(self, request):
