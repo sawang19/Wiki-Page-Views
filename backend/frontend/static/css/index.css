@@ -40,6 +40,17 @@ body
 { 
     background-color: #e8e8e8;
 }
+.intro {
+    font-family: "Nanum Pen Script",cursive;
+    margin: auto;
+    width: 80%;
+}
+.description {
+    font-family: Georgia,serif; 
+    margin: auto;
+    width: 80%;
+}
+.page-header h1{ margin-top: 50px; }
 .home-page {
     margin: auto;
     width: 80%;
@@ -57,3 +68,4 @@ body
 #userInput {
     width: 30%;
 }
+

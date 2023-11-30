@@ -1,24 +1,39 @@
 <!DOCTYPE html >
 <html>
-<body>
-    <header>
+    <head>
         {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"/>
-        <div id="logo"> 
-            <h2>WikiTrends</h2>
-        </div> 
-        <div id="topNav">
-            <nav>
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="event">Daily top 10</a></li>
-                <li><a href="trendings">Trendings</a></li>
-            </nav>
+        <link rel="icon" type="image/x-icon" href="{% static "favicon_io/favicon.ico" %}"/>
+        <link rel="icon" type="image/png" href="{% static "favicon_io/favicon-32x32.png" %}"/>
+    </head>
+    <body>
+        <header>
+            <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"/>
+            <div id="logo"> 
+                <h2>WikiTrends</h2>
+            </div> 
+            <div id="topNav">
+                <nav>
+                    <li class="active"><a href="/">Home</a></li>
+                    <li><a href="event">Daily top 10</a></li>
+                    <li><a href="trendings">Trendings</a></li>
+                </nav>
+            </div>
+        </header>
+        <div class="page-header">
+            <h1 style="text-align: center;">
+                Welcome!</h1>
+        </div><br>
+        <hr>
+        <div class="intro">
+            <h1>Hi, this is the homepage of our application - WikiTrends.</h1>
         </div>
-    </header>
-    <hr>
-    <div class = "home-page">
-        <h4>Hi, this is the home page of our web-application.</h4>
-    </div>
 
-</body>
+        <div class="description">
+            The rapid growth of Artificial Intelligence has raised concerns about the emergence of Information Cocoons. When using social media platforms like Instagram and Twitter, algorithms tend to recommend content that aligns with users' existing opinions and ideas. In this situation, knowing whether the event we are interested in is also a concern of others is crucial. In today's Information Age, people rely on the internet for access to a wealth of information, with Wikipedia serving as an important resource. In this context, monitoring and understanding Wikipedia trends is invaluable, which offers insights into daily trending events and user preferences. 
+            <br><br>
+            To address this, we propose the creation of WikiTrends, a user-friendly web application. It can not only see the Top 10 wiki pages viewed most on a certain day but also see the trending of a certain word in a specific timeframe.
+            <br><br>
+            Currently, due to the limit of cost and time, we only support the data from January 1st, 2023 to June 30th, 2023. However, it is scalable, which means that it can support data for a longer time.
+        </div>
+    </body>
 </html>
