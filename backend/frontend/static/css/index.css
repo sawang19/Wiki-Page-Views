@@ -11,11 +11,11 @@ header {
     font-family: cursive;
 }
 #topNav {
-    font-family: Georgia,serif;
+    /* font-family: Georgia,serif; 
     font-weight: normal;
     letter-spacing: 0px;
     line-height: 1.6em; 
-    font-size: 13px;
+    font-size: 13px; */
     text-transform: uppercase;
     position: relative;
     text-decoration: none;
