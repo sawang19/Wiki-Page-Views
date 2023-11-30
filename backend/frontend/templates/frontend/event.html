@@ -4,6 +4,8 @@
     <header>
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"/>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <div id="logo"> 
             <h2>WikiTrends</h2>
         </div> 
@@ -17,9 +19,83 @@
     </header>
     <hr>
     <div class = "home-page">
-
-        <h4>Hi, this is the home page of our web-application. EventViews</h4>
+        <label for="target">Please enter the date that you want to see the Top 10 tags:</label><br>
+        <input type="date" id="target" placeholder=""><br><br>
+        <input type="submit" value="View" id="button"> 
     </div>
+    <div class = "chart_container">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+        var chart;
+        var button = document.getElementById("button");
+        
+        button.addEventListener("click", async function() {
+            var target_date = document.getElementById("target").value;
+            console.log(target_date);
+            date = {"date": target_date};
+            axios.post('http://52.38.55.145:8000/wikipage/top10', date, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                let data_string = response.data;
+                const data_dict = JSON.parse(data_string);
+                console.log("data_dict", data_dict)
+                const views = data_dict["views"]
+                const label = data_dict["titles"]
+                for (let i = 0; i < 10; i++) {
+                    title = label[i].replaceAll('_', ' ');
+                    label[i] = title;
+                }
+                
+                var chartData = {
+                    labels: label,
+                    datasets: [{
+                        label: target_date,
+                        data: views,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(201, 203, 207, 0.2)',
+                            'rgba(0, 0, 0, 0.2)',
+                            'rgba(33, 79, 255, 0.2)',
+                            'rgba(21, 120, 29, 0.2)',
+                        ],
+                    }]
+                }
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const cfg = {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    },
+                };
+
+                if (!chart) {
+                    chart = new Chart(ctx, cfg);
+                }
+                else {
+                    chart.data = chartData;
+                    chart.update();
+                }
+            })
+            .catch((error) => {
+                    console.error('Error:', error);
+            });
+        });
+    </script>
 
 </body>
 </html>
