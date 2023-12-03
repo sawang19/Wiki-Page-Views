@@ -1,0 +1,198 @@
+<!DOCTYPE html >
+<html>
+    <head>
+        {% load static %}
+        <link rel="icon" type="image/x-icon" href="{% static "favicon_io/favicon.ico" %}"/>
+        <link rel="icon" type="image/png" href="{% static "favicon_io/favicon-32x32.png" %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static "css/index.css" %}"/>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <header>
+            <div id="logo"> 
+                <h2>WikiTrends</h2>
+            </div> 
+            <div id="topNav">
+                <nav>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="event">Daily top 10</a></li>
+                    <li class="active"><a href="trendings">Trendings</a></li>
+                </nav>
+            </div>
+        </header>
+        <hr>
+        <div class = "home-page">
+            
+            <label for="keyword">Please enter a single word in English to view its trendings:</label>
+            <br>
+            <input type="text" id="keyword" placeholder="e.g. cat, dog ..."><br><br>
+
+            <label for="startTime">Please enter the start time:</label>
+            <input type="date" id="startTime" placeholder=""><br><br>
+            <label for="endTime">Please enter the end time:</label>
+            <input type="date" id="endTime" placeholder=""><br><br>
+            <input type="submit" value="Submit" id="my_button"> 
+        </div>
+
+        <div class = "chart_container">
+            <canvas id="myChart"></canvas>
+        </div>
+
+        
+        <script>
+            var chart;
+            var input = document.querySelector('input[id=keyword]');
+            var tags = new Tagify(input);
+
+            function checkUserInput() {
+                var tagifyTags = tags.value.map(tag => tag.value);
+                const count = tagifyTags.length;
+                const words = tagifyTags;
+
+                if (tagifyTags.length === 0) {
+                    alert("The keyword cannot be empty!");
+                    return false;
+                }
+
+                var startTime = document.getElementById("startTime").value;
+                var endTime = document.getElementById("endTime").value;
+
+                if (tagifyTags.length === 0) {
+                    alert("The keyword cannot be empty!");
+                    return false;
+                }
+
+                if (startTime == "") {
+                    alert ("The start time is empty or invalid!")
+                    return false;
+                }
+                if (endTime == "") {
+                    alert ("The end time is empty or invalid!")
+                    return false;
+                }
+                
+                if (startTime > endTime) {
+                    alert("The start date needs to before than end date!");
+                    return false;
+                }
+
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                const day = today.getDate().toString().padStart(2, '0');
+                const formattedDate = `${year}-${month}-${day}`;
+
+                if (endTime >= formattedDate) {
+                    alert("The end date needs to before than current date!");
+                }
+
+                var tags_arr = []
+                for (let i = 0; i < count; i++) {
+                    var keyword = words[i];
+                    keyword = keyword.trim();
+                    // console.log(keyword)
+
+                    var english = /^[A-Za-z0-9]*$/;
+                    if (english.test(keyword) == false) {
+                        alert("The keyword is not in English!");
+                        return false;
+                    }
+                    tags_arr.push(keyword);
+                }
+                return [startTime, endTime, tags_arr];
+            }
+
+            async function plotChart(returnedValue) {
+                console.log("in " + returnedValue[2]);
+                var dtset = [];
+                var promises = [];
+                
+                for (let i = 0; i < returnedValue[2].length; i++) {
+                    const startTime = returnedValue[0];
+                    const endTime = returnedValue[1];
+                    const keyword = returnedValue[2][i];
+                    var data = {"keyword": keyword ,"startTime": startTime, "endTime": endTime};
+                    // console.log(data)
+
+                    promises.push(
+                        axios.post('http://52.38.55.145:8000/wikipage/post-req/', data, {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then((response) => {
+                            let data_string = response.data;
+                            const data_dict = JSON.parse(data_string);
+                            // console.log("data_dict", data_dict)
+                            views = data_dict["views"]
+
+                            const plot_prep = []
+                            for (const [key, value] of Object.entries(views)) {
+                                plot_prep.push({ x: key, y: value });
+                            }
+                            // console.log(plot_prep)
+
+                            if (!chart) {
+                                sub_dataset = {label: keyword, data: plot_prep};
+                                dtset.push(sub_dataset);
+                                // console.log("no chart", i)
+                            } else {
+                                if (i == 0) {
+                                    chart.data.datasets = dtset;
+                                } 
+                                sub_dataset = {label: keyword, data: plot_prep};
+                                dtset.push(sub_dataset);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        })
+                    );
+                }
+                await Promise.all(promises);
+                return dtset;
+            }
+
+
+            var button = document.getElementById("my_button");
+            button.addEventListener("click", async function() {
+                // var content = document.getElementById("keyword").value;
+                // console.log("content", content)
+                var returnedValue = checkUserInput();
+                // console.log("Returned value from the button click:", returnedValue);
+                if (returnedValue != false) {
+                    var curr_data = await plotChart(returnedValue);
+                    // console.log("curr_daata", curr_data);
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    const cfg = {
+                        type: 'line',
+                        data: {
+                            datasets: curr_data
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                    colors: {
+                                        forceOverride: true
+                                }
+                            }
+                        }
+                    }
+                    if (!chart) {
+                        chart = new Chart(ctx, cfg);
+                    }
+                    else {
+                        chart.update();
+                    }
+                }
+            });
+            
+        </script>
+    </body>
+</html>
+

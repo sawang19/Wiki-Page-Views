@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-7)=&8vz@di^duq^mq&(3nar@s2(b4^o!#it7)xngi6auauz0n2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['52.38.55.145']
+ALLOWED_HOSTS = ['52.38.55.145', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'wikipage.apps.WikipageConfig',
     'rest_framework',
-    'frontend.apps.FrontendConfig'
+    'frontend.apps.FrontendConfig',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +52,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -87,7 +91,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'WikipageDB',
+        'NAME': 'wiki',
         'USER': 'admin',
         'PASSWORD': 'admin123',
         'HOST': 'wikidb.cucxptcd7b4g.us-west-2.rds.amazonaws.com',
@@ -131,9 +135,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, '../frontend/build/static'),
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend/static/'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
