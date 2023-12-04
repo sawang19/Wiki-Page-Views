@@ -5,9 +5,9 @@ WikiTrends is a web-based application allowing users to see the daily Top 10 vie
 There are three pages in our application:
 
 | Page |Features| 
-|--|--|--|
+|--|--|
 | Homepage |It briefly introduces reasons to build this application, our app's functions, and what we currently support.
-| Daily Top 10 |Users can enter a date, and it will show a bar chart to display the titles of wiki pages viewed most. |
+| Daily Top 10|Users can enter a date, and it will show a bar chart to display the titles of wiki pages viewed most. |
 | Trendings |Users can enter multiple keywords as tags and define a timeframe they are interested in, it will show a line chart displaying their trends.|
 
 
