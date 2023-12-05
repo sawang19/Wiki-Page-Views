@@ -4,12 +4,16 @@ import os
 import gzip
 import requests
 
+# this version get the daily original file from https://dumps.wikimedia.org/other/pageview_complete
+# and split into small .gz files. there is no logic in splitting. only keep the lines complete and write
+# to a new file when it reaches the expected size
 
 def get_output_folder(input_file):
     # Use regular expressions to extract the desired portion from the input file name
     match = re.search(r'(\d{8}-user)', input_file)
     if match:
         output_folder = match.group(1)
+        output_folder = f"pageviews-{output_folder}"
     else:
         # Handle the case where the pattern is not found
         raise ValueError("Pattern not found in the input file name")
@@ -31,8 +35,6 @@ def download_input_file(base_url, date, target_file):
 
 
 def split_and_compress(input_bz2_file, target_chunk_size, compress_folder):
-    # Get the output folder name from the input file
-    output_folder = get_output_folder(input_bz2_file)
 
     # Open the input .bz2 file
     with bz2.BZ2File(input_bz2_file, 'rb') as bz2_file:
@@ -40,8 +42,9 @@ def split_and_compress(input_bz2_file, target_chunk_size, compress_folder):
         current_lines = []
         part_number = 0
         current_chunk_size = 0
-
+        prefix = "en.wikipedia".encode('utf-8')
         for line in bz2_file:
+          if line.startswith(prefix):
             current_lines.append(line)
             current_chunk_size += len(line)
 
@@ -66,15 +69,19 @@ def split_and_compress(input_bz2_file, target_chunk_size, compress_folder):
 
 
 if __name__ == '__main__':
-    date = "20230103"  # Replace with your desired date
-    base_url = "https://dumps.wikimedia.org/other/pageview_complete"
-    target_file = f"pageviews-{date}-user.bz2"
+    for i in range(0, 9):
+        num = 20230622 + i
+        date = str(num)
+        print(date)
+        #date = "20230110"  # Replace with your desired date
+        base_url = "https://dumps.wikimedia.org/other/pageview_complete"
+        target_file = f"pageviews-{date}-user.bz2"
 
-    download_input_file(base_url, date, target_file)
+        download_input_file(base_url, date, target_file)
 
-    target_chunk_size = 16 * 1024 * 1024  # Adjust to the desired target chunk size in bytes
-    compress_folder = get_output_folder(target_file)  # Get the output folder name from the input file
+        target_chunk_size = 16 * 1024 * 1024  # Adjust to the desired target chunk size in bytes
+        compress_folder = get_output_folder(target_file)  # Get the output folder name from the input file
 
-    os.makedirs(compress_folder, exist_ok=True)
+        os.makedirs(compress_folder, exist_ok=True)
 
-    split_and_compress(target_file, target_chunk_size, compress_folder)
+        split_and_compress(target_file, target_chunk_size, compress_folder)
