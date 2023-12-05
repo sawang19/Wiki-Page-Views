@@ -52,53 +52,60 @@
                     .then((response) => {
                         let data_string = response.data;
                         const data_dict = JSON.parse(data_string);
-                        console.log("data_dict", data_dict)
+
                         const views = data_dict["views"]
                         const label = data_dict["titles"]
-                        for (let i = 0; i < 10; i++) {
-                            title = label[i].replaceAll('_', ' ');
-                            label[i] = title;
-                        }
-                        
-                        var chartData = {
-                            labels: label,
-                            datasets: [{
-                                label: target_date,
-                                data: views,
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.6)',
-                                    'rgba(255, 159, 64, 0.6)',
-                                    'rgba(255, 205, 86, 0.6)',
-                                    'rgba(75, 192, 192, 0.6)',
-                                    'rgba(54, 162, 235, 0.6)',
-                                    'rgba(153, 102, 255, 0.6)',
-                                    'rgba(201, 203, 207, 0.6)',
-                                    'rgba(0, 0, 0, 0.6)',
-                                    'rgba(33, 79, 255, 0.6)',
-                                    'rgba(21, 120, 29, 0.6)',
-                                ],
-                            }]
-                        }
-                        const ctx = document.getElementById('myChart').getContext('2d');
-                        const cfg = {
-                            type: 'bar',
-                            data: chartData,
-                            options: {
-                                scales: {
-                                    y: {
-                                        beginAtZero: true
-                                    }
-                                }
-                            },
-                        };
-
-                        if (!chart) {
-                            chart = new Chart(ctx, cfg);
+                        if (label.length == 0) {
+                            alert("We do not support the current input date: currently, we only support date from 01/01/2023 to 06/30/2023");
+                            return;
                         }
                         else {
-                            chart.data = chartData;
-                            chart.update();
+                            for (let i = 0; i < 10; i++) {
+                                title = label[i].replaceAll('_', ' ');
+                                label[i] = title;
+                            }
+                            
+                            var chartData = {
+                                labels: label,
+                                datasets: [{
+                                    label: target_date,
+                                    data: views,
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.6)',
+                                        'rgba(255, 159, 64, 0.6)',
+                                        'rgba(255, 205, 86, 0.6)',
+                                        'rgba(75, 192, 192, 0.6)',
+                                        'rgba(54, 162, 235, 0.6)',
+                                        'rgba(153, 102, 255, 0.6)',
+                                        'rgba(201, 203, 207, 0.6)',
+                                        'rgba(0, 0, 0, 0.6)',
+                                        'rgba(33, 79, 255, 0.6)',
+                                        'rgba(21, 120, 29, 0.6)',
+                                    ],
+                                }]
+                            }
+                            const ctx = document.getElementById('myChart').getContext('2d');
+                            const cfg = {
+                                type: 'bar',
+                                data: chartData,
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                },
+                            };
+
+                            if (!chart) {
+                                chart = new Chart(ctx, cfg);
+                            }
+                            else {
+                                chart.data = chartData;
+                                chart.update();
+                            }
                         }
+                        
                     })
                     .catch((error) => {
                             console.error('Error:', error);

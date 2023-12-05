@@ -61,6 +61,20 @@
                 var startTime = document.getElementById("startTime").value;
                 var endTime = document.getElementById("endTime").value;
 
+                var start = startTime.split("-");
+                var end = endTime.split("-");
+
+                if (start[0] != "2023" || end[0] != "2023") {
+                    alert("Our dataset do not support this year!");
+                    return false;
+                }
+
+                const supported_months = ['01', '02', '03', '04', '05', '06'];
+                if (supported_months.includes(start[1]) == false || supported_months.includes(end[1]) == false) {
+                    alert("Our dataset do not support the input months!");
+                    return false;
+                }
+
                 if (tagifyTags.length === 0) {
                     alert("The keyword cannot be empty!");
                     return false;
@@ -107,7 +121,6 @@
             }
 
             async function plotChart(returnedValue) {
-                console.log("in " + returnedValue[2]);
                 var dtset = [];
                 var promises = [];
                 
